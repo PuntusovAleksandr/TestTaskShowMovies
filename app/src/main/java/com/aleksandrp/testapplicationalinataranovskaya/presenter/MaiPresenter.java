@@ -2,11 +2,19 @@ package com.aleksandrp.testapplicationalinataranovskaya.presenter;
 
 import android.support.v4.app.FragmentManager;
 
+import com.aleksandrp.testapplicationalinataranovskaya.activity.MainActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
+import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkFailEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.event.UpdateUiEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.PresenterEventListener;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_POPULAR;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_POPULAR;
 
 /**
  * Created by AleksandrP on 11.09.2017.
@@ -42,18 +50,18 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
 
             @Override
             public void onNext(Object mO) {
-//                if (mO instanceof UpdateUiEvent) {
-//                    UpdateUiEvent event = (UpdateUiEvent) mO;
-//                    Object data = event.getData();
-//                    if (event.getId() == RESPONSE_GET_PLACES) {
-//                        saveTasksDb((List<PlaceModel>) data);
+                if (mO instanceof UpdateUiEvent) {
+                    UpdateUiEvent event = (UpdateUiEvent) mO;
+                    Object data = event.getData();
+                    if (event.getId() == RESPONSE_LIST_POPULAR) {
+                        showListPopular((ListMoveModel) data);
 //                    } else if (event.getId() == RESPONSE_GET_ID_TASK) {
 //                        showDataTask((TaskModel) data);
-//                    }
-//                } else if (mO instanceof NetworkFailEvent) {
-//                    NetworkFailEvent event = (NetworkFailEvent) mO;
-//                    showMessageError(event.getMessage());
-//                }
+                    }
+                } else if (mO instanceof NetworkFailEvent) {
+                    NetworkFailEvent event = (NetworkFailEvent) mO;
+                    showMessageError(event.getMessage());
+                }
             }
         };
         BusProvider.observe().observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
@@ -73,4 +81,20 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
         subscriber = null;
     }
 
+    //================================================
+
+    public void showMessageError(String mData) {
+        ((MainActivity) mvpView).showMessageError(mData);
+    }
+
+    public void showListPopular(ListMoveModel mData) {
+        ((MainActivity) mvpView).showListPopular(mData);
+    }
+    //================================================
+
+    public void getLostMoves() {
+        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
+        mEvent.setId(LIST_POPULAR);
+        ((MainActivity) mvpView).makeRequest(mEvent);
+    }
 }

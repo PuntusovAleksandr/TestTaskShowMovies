@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TestApplication Alina Taranovskaya</string>
     <string name="bad_internet">Bad internet connection</string>
+    <string name="popular">Popular</string>
+    <string name="favorite">Favorite</string>
+    <string name="no_internet">No internet connection</string>
 </resources>

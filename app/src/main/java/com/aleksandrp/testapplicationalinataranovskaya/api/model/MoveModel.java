@@ -22,7 +22,7 @@ public class MoveModel {
     public boolean video;
     @SerializedName("vote_average")
     @Expose
-    public int vote_average;
+    public String vote_average;
     @SerializedName("title")
     @Expose
     public String title;

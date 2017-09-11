@@ -66,7 +66,7 @@ public class ApiMoveHelper {
                     public void onNext(Response<ListMoveModel> mResponse) {
                         if (mResponse.isSuccessful()) {
                             event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.ERROR);
+                            event.setId(ApiConstants.LIST_POPULAR);
                             body = mResponse.body();
                         }
                     }
