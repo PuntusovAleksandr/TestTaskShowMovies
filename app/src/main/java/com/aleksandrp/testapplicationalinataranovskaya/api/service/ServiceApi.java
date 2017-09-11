@@ -107,6 +107,9 @@ public class ServiceApi extends Service {
             case ApiConstants.LIST_POPULAR:
                 mMoveHelper.getListPopular(page, genres);
                 break;
+            case ApiConstants.LIST_OFFICIAL:
+                mMoveHelper.getListGenres();
+                break;
             case ApiConstants.SEARCH_MOVE:
                 mMoveHelper.searchMovies(search);
                 break;
@@ -124,6 +127,9 @@ public class ServiceApi extends Service {
             //
             case ApiConstants.LIST_POPULAR:
                 updateUiEvent.setId(ApiConstants.RESPONSE_LIST_POPULAR);
+                break;
+            case ApiConstants.LIST_OFFICIAL:
+                updateUiEvent.setId(ApiConstants.RESPONSE_LIST_OFFICIAL);
                 break;
 
         }

@@ -7,13 +7,16 @@ import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkFailEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.UpdateUiEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListGenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.PresenterEventListener;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_OFFICIAL;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_POPULAR;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_OFFICIAL;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_POPULAR;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.SEARCH_MOVE;
 
@@ -56,8 +59,8 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
                     Object data = event.getData();
                     if (event.getId() == RESPONSE_LIST_POPULAR) {
                         showListPopular((ListMoveModel) data);
-//                    } else if (event.getId() == RESPONSE_GET_ID_TASK) {
-//                        showDataTask((TaskModel) data);
+                    } else if (event.getId() == RESPONSE_LIST_OFFICIAL) {
+                        showGenres((ListGenresModel) data);
                     }
                 } else if (mO instanceof NetworkFailEvent) {
                     NetworkFailEvent event = (NetworkFailEvent) mO;
@@ -91,12 +94,22 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
     public void showListPopular(ListMoveModel mData) {
         ((MainActivity) mvpView).showListPopular(mData);
     }
+
+    public void showGenres(ListGenresModel mData) {
+        ((MainActivity) mvpView).showGenres(mData.genres);
+    }
     //================================================
 
-    public void getLostMoves() {
+    public void getListGenres() {
+        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
+        mEvent.setId(LIST_OFFICIAL);
+        ((MainActivity) mvpView).makeRequest(mEvent, null, null);
+    }
+
+    public void getLostMoves(String genres) {
         final NetworkRequestEvent mEvent = new NetworkRequestEvent();
         mEvent.setId(LIST_POPULAR);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, null);
+        ((MainActivity) mvpView).makeRequest(mEvent, null, genres);
     }
 
     public void searchMovies(String search) {

@@ -16,13 +16,17 @@ import android.widget.RelativeLayout;
 
 import com.aleksandrp.testapplicationalinataranovskaya.App;
 import com.aleksandrp.testapplicationalinataranovskaya.R;
+import com.aleksandrp.testapplicationalinataranovskaya.activity.dialog.FilterDialog;
 import com.aleksandrp.testapplicationalinataranovskaya.adapter.ViewAdapter;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.model.GenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.service.ServiceApi;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.MaiPresenter;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.MvpActionView;
 import com.aleksandrp.testapplicationalinataranovskaya.utils.ShowToast;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,6 +36,7 @@ import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STAT
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_SEARCH;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.SERVICE_JOB_ID_TITLE;
 import static com.aleksandrp.testapplicationalinataranovskaya.utils.InternetUtils.checkInternetConnection;
+import static com.aleksandrp.testapplicationalinataranovskaya.utils.ShowKeyboard.hideKeynoard;
 
 public class MainActivity extends AppCompatActivity implements MvpActionView {
 
@@ -49,15 +54,16 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
     @Bind(R.id.iv_filter)
     ImageView iv_filter;
 
-    private UpdatePopular ьДUpdatePopular;
+    private UpdatePopular mUpdatePopular;
     private UpdateFavorite mListenerFavorite;
 
     private Intent serviceIntent;
     private MaiPresenter mPresenter;
 
-    private FragmentManager mFragmentManager;
+    private FilterDialog mFilterDialog;
 
     private String textSearch;
+    private String genres;
     private boolean blockSearch;
     private final int TIME_OUT_SEARCH = 500;
 
@@ -71,12 +77,12 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
         mPresenter = new MaiPresenter();
         mPresenter.setMvpView(this);
         mPresenter.init();
-        mFragmentManager = getSupportFragmentManager();
 
         initViewPager();
 
         blockSearch = true;
         textSearch = "";
+        genres = "";
         et_search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence mCharSequence, int mI, int mI1, int mI2) {
@@ -122,7 +128,29 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
 
     @OnClick(R.id.iv_filter)
     public void iv_filterClick() {
-        // TODO: 12.09.2017 DIALOG
+        hideKeynoard(this, iv_filter);
+        if (mFilterDialog != null && mFilterDialog.isShowing()) return;
+
+        mPresenter.getListGenres();
+
+        mFilterDialog = new FilterDialog(this);
+        mFilterDialog.setListener(new FilterDialog.SelectGenresListener() {
+            @Override
+            public void showMovies(String genres) {
+                MainActivity.this.genres = genres;
+                if (genres.isEmpty()) {
+                    mPresenter.getLostMoves(genres);
+                    return;
+                } else {
+                    if (et_search.getText().length() > 0) {
+                        et_search.setText("");
+                    } else {
+                        mPresenter.getLostMoves(genres);
+                    }
+                }
+            }
+        });
+        mFilterDialog.show();
     }
 
     //    ===========================================
@@ -163,11 +191,10 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
                 public void run() {
                     if (checkInternetConnection()) {
                         blockSearch = true;
-                        showProgress(true);
                         if (textSearch.length() > 0) {
                             mPresenter.searchMovies(textSearch);
                         } else {
-                            mPresenter.getLostMoves();
+                            mPresenter.getLostMoves(genres);
                         }
                     } else {
                         showMessageError(App.getContext().getString(R.string.no_internet));
@@ -179,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
 
     //    ===========================================
     public void setListenerPopular(UpdatePopular mListenerPopular) {
-        this.ьДUpdatePopular = mListenerPopular;
+        this.mUpdatePopular = mListenerPopular;
     }
 
     public void setListenerPresenter(UpdateFavorite mListenerFavorite) {
@@ -189,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
     //    ===========================================
 
     public void makeRequest(NetworkRequestEvent mEvent, String mSearch, String filter) {
+        showProgress(true);
         serviceIntent.putExtra(SERVICE_JOB_ID_TITLE, mEvent.getId());
         serviceIntent.putExtra(EXTRA_SEARCH, mSearch);
         serviceIntent.putExtra(EXTRA_GENRES_ID, filter);
@@ -198,8 +226,7 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
     //    ===========================================
     public void getLostMoves() {
         if (checkInternetConnection()) {
-            showProgress(true);
-            mPresenter.getLostMoves();
+            mPresenter.getLostMoves(genres);
         } else {
             showMessageError(App.getContext().getString(R.string.no_internet));
         }
@@ -216,12 +243,22 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
 
     public void showListPopular(ListMoveModel mData) {
         showProgress(false);
-        if (ьДUpdatePopular != null) {
-            ьДUpdatePopular.updateList(mData);
+        if (mUpdatePopular != null) {
+            mUpdatePopular.updateList(mData);
+        }
+    }
+
+    public void showGenres(List<GenresModel> mData) {
+        showProgress(false);
+        if (mFilterDialog != null && mFilterDialog.isShowing()) {
+            mFilterDialog.updateListGenres(mData);
         }
     }
 
     public void showMessageError(String mData) {
+        if (mFilterDialog != null && mFilterDialog.isShowing()) {
+            mFilterDialog.showProgress(false);
+        }
         showProgress(false);
         ShowToast.showMessageError(mData);
     }

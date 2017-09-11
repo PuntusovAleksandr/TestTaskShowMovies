@@ -1,10 +1,8 @@
 package com.aleksandrp.testapplicationalinataranovskaya.api.interfaces;
 
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.FullInfoMoveModel;
-import com.aleksandrp.testapplicationalinataranovskaya.api.model.GenresModel;
+import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListGenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
-
-import java.util.List;
 
 import retrofit2.Response;
 import retrofit2.http.GET;
@@ -26,7 +24,7 @@ public interface ServiceTask {
             @Query("with_genres") String with_genres);
 
     @GET("genre/movie/list")
-    Observable<Response<List<GenresModel>>> getListOficial(
+    Observable<Response<ListGenresModel>> getListOficial(
             @Query("api_key") String api_key);
 
     @GET("search/movie")
