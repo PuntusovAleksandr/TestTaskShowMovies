@@ -19,6 +19,7 @@ import rx.android.schedulers.AndroidSchedulers;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_GENRES_ID;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_PAGE;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_SEARCH;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.SERVICE_JOB_ID_TITLE;
 
 /**
@@ -99,11 +100,15 @@ public class ServiceApi extends Service {
         this.startId = startId;
         int jobId = intent.getIntExtra(SERVICE_JOB_ID_TITLE, -1);
         int page = intent.getIntExtra(EXTRA_PAGE, 1);
+        String search = intent.getStringExtra(EXTRA_SEARCH);
         String genres = intent.getStringExtra(EXTRA_GENRES_ID);
         switch (jobId) {
             //
             case ApiConstants.LIST_POPULAR:
                 mMoveHelper.getListPopular(page, genres);
+                break;
+            case ApiConstants.SEARCH_MOVE:
+                mMoveHelper.searchMovies(search);
                 break;
         }
         return START_NOT_STICKY;

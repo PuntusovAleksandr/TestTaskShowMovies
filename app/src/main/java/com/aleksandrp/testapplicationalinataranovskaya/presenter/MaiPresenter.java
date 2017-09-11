@@ -15,6 +15,7 @@ import rx.android.schedulers.AndroidSchedulers;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_POPULAR;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_POPULAR;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.SEARCH_MOVE;
 
 /**
  * Created by AleksandrP on 11.09.2017.
@@ -95,6 +96,12 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
     public void getLostMoves() {
         final NetworkRequestEvent mEvent = new NetworkRequestEvent();
         mEvent.setId(LIST_POPULAR);
-        ((MainActivity) mvpView).makeRequest(mEvent);
+        ((MainActivity) mvpView).makeRequest(mEvent, null, null);
+    }
+
+    public void searchMovies(String search) {
+        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
+        mEvent.setId(SEARCH_MOVE);
+        ((MainActivity) mvpView).makeRequest(mEvent, search, null);
     }
 }

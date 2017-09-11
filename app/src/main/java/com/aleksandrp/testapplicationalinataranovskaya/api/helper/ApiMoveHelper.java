@@ -73,4 +73,51 @@ public class ApiMoveHelper {
                 });
     }
 
+
+    public void searchMovies(String mSearch) {
+        restAdapter.init(true, "getListPopular");
+        ServiceTask serviceUser =
+                restAdapter.getRetrofit().create(ServiceTask.class);
+        Observable<Response<ListMoveModel>> allSources =
+                serviceUser.searchMove(API_KEY, mSearch);
+        allSources.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Response<ListMoveModel>>() {
+                    private NetworkResponseEvent event;
+                    private NetworkResponseEvent<String> eventError;
+                    private ListMoveModel body;
+
+                    @Override
+                    public void onCompleted() {
+                        if (event != null) {
+                            event.setSucess(true);
+                            event.setData(body);
+                        } else {
+                            event = new NetworkResponseEvent<>();
+                            event.setId(ApiConstants.ERROR);
+                            event.setSucess(false);
+                        }
+                        BusProvider.send(event);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        eventError = new NetworkResponseEvent<>();
+                        eventError.setId(ApiConstants.ERROR);
+                        eventError.setData("Error load Sources ::: " + e.getMessage());
+                        eventError.setSucess(false);
+                        BusProvider.send(eventError);
+                    }
+
+                    @Override
+                    public void onNext(Response<ListMoveModel> mResponse) {
+                        if (mResponse.isSuccessful()) {
+                            event = new NetworkResponseEvent<>();
+                            event.setId(ApiConstants.LIST_POPULAR);
+                            body = mResponse.body();
+                        }
+                    }
+                });
+    }
+
 }

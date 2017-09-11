@@ -14,6 +14,7 @@ public class STATIC_PARAMS {
 
     // extras for send data by api
     public static final String EXTRA_PAGE = "EXTRA_PAGE";
+    public static final String EXTRA_SEARCH = "EXTRA_SEARCH";
     public static final String EXTRA_GENRES_ID = "EXTRA_GENRES_ID";
 
 }
