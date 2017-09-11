@@ -20,7 +20,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestAdapter {
 
-    public static final String API_BASE_URL = "";
+    public static final String API_BASE_URL_IMAGE = "https://image.tmdb.org/t/p/w500/";
+    public static final String API_BASE_URL = "https://api.themoviedb.org/3/";
     public static final String API_KEY = "fbe4e6280f6a460beaad8ebe2bc130ac";
 
     private Retrofit retrofit;

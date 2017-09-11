@@ -17,6 +17,8 @@ import com.aleksandrp.testapplicationalinataranovskaya.api.helper.ApiMoveHelper;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_GENRES_ID;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_PAGE;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.SERVICE_JOB_ID_TITLE;
 
 /**
@@ -96,10 +98,12 @@ public class ServiceApi extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         this.startId = startId;
         int jobId = intent.getIntExtra(SERVICE_JOB_ID_TITLE, -1);
+        int page = intent.getIntExtra(EXTRA_PAGE, 1);
+        String genres = intent.getStringExtra(EXTRA_GENRES_ID);
         switch (jobId) {
             //
-            case ApiConstants.SIGN_UP:
-                mMoveHelper.createTask();
+            case ApiConstants.LIST_POPULAR:
+                mMoveHelper.getListPopular(page, genres);
                 break;
         }
         return START_NOT_STICKY;
@@ -113,8 +117,8 @@ public class ServiceApi extends Service {
         updateUiEvent.setData(event.getData());
         switch (event.getId()) {
             //
-            case ApiConstants.SIGN_UP:
-                updateUiEvent.setId(ApiConstants.RESPONSE_SIGN_IN);
+            case ApiConstants.LIST_POPULAR:
+                updateUiEvent.setId(ApiConstants.RESPONSE_LIST_POPULAR);
                 break;
 
         }

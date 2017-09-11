@@ -7,11 +7,16 @@ package com.aleksandrp.testapplicationalinataranovskaya.api.constants;
 public interface ApiConstants {
     int ERROR = 0;
     //
-    int SIGN_UP = 1;
-    int SIGN_IN = 2;
+    int LIST_POPULAR = 1;
+    int LIST_OFFICIAL = 2;
+    int SEARCH_MOVE = 3;
+    int GET_MOVE_INFO = 4;
 
     ///  response
     //
-    int RESPONSE_SIGN_IN = 1;
+    int RESPONSE_LIST_POPULAR = 1;
+    int RESPONSE_LIST_OFFICIAL = 2;
+    int RESPONSE_SEARCH_MOVE = 3;
+    int RESPONSE_GET_MOVE_INFO = 4;
 
 }

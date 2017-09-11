@@ -5,12 +5,15 @@ import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
 import com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkResponseEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.interfaces.ServiceTask;
+import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 
 import retrofit2.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.aleksandrp.testapplicationalinataranovskaya.api.RestAdapter.API_KEY;
 
 /**
  * Created by AleksandrP on 11.09.2017.
@@ -24,18 +27,18 @@ public class ApiMoveHelper {
         restAdapter = new RestAdapter();
     }
 
-    public void createTask() {
-        restAdapter.init(true, "createTask");
+    public void getListPopular(int mPage, String mGenres) {
+        restAdapter.init(true, "getListPopular");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
-        Observable<Response<Object>> allSources =
-                serviceUser.createTask();
+        Observable<Response<ListMoveModel>> allSources =
+                serviceUser.getListPopular(API_KEY, mPage, "popularity.des", mGenres);
         allSources.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response<Object>>() {
+                .subscribe(new Subscriber<Response<ListMoveModel>>() {
                     private NetworkResponseEvent event;
                     private NetworkResponseEvent<String> eventError;
-                    private Object body;
+                    private ListMoveModel body;
 
                     @Override
                     public void onCompleted() {
@@ -60,7 +63,7 @@ public class ApiMoveHelper {
                     }
 
                     @Override
-                    public void onNext(Response<Object> mResponse) {
+                    public void onNext(Response<ListMoveModel> mResponse) {
                         if (mResponse.isSuccessful()) {
                             event = new NetworkResponseEvent<>();
                             event.setId(ApiConstants.ERROR);

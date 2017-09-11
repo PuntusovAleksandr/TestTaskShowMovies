@@ -13,8 +13,7 @@ public class STATIC_PARAMS {
     public static final String SERVICE_JOB_ID_TITLE = "serviceJobId";
 
     // extras for send data by api
-    public static final String EXTRA_TOKEN_FB = "EXTRA_TOKEN_FB";
-    public static final String EXTRA_STRIPE = "EXTRA_STRIPE";
-    public static final String EXTRA_ID_TASK = "EXTRA_ID_TASK";
+    public static final String EXTRA_PAGE = "EXTRA_PAGE";
+    public static final String EXTRA_GENRES_ID = "EXTRA_GENRES_ID";
 
 }
