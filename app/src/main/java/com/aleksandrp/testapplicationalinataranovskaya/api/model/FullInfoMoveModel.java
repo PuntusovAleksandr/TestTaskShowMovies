@@ -17,12 +17,9 @@ public class FullInfoMoveModel {
     @SerializedName("backdrop_path")
     @Expose
     public String backdrop_path;
-    @SerializedName("belongs_to_collection")
-    @Expose
-    public List belongs_to_collection;
     @SerializedName("budget")
     @Expose
-    public long budget;
+    public String budget;
     @SerializedName("genres")
     @Expose
     public List<GenresModel> genres;
@@ -34,7 +31,7 @@ public class FullInfoMoveModel {
     public long id;
     @SerializedName("imdb_id")
     @Expose
-    public long imdb_id;
+    public String imdb_id;
     @SerializedName("original_language")
     @Expose
     public String original_language;
@@ -55,10 +52,29 @@ public class FullInfoMoveModel {
     public String release_date;
     @SerializedName("revenue")
     @Expose
-    public long revenue;
+    public String revenue;
     @SerializedName("runtime")
     @Expose
-    public long runtime;
+    public String runtime;
+    @SerializedName("status")
+    @Expose
+    public String status;
+    @SerializedName("tagline")
+    @Expose
+    public String tagline;
+    @SerializedName("title")
+    @Expose
+    public String title;
+    @SerializedName("video")
+    @Expose
+    public boolean video;
+    @SerializedName("vote_average")
+    @Expose
+    public String vote_average;
+    @SerializedName("vote_count")
+    @Expose
+    public String vote_count;
+
     @SerializedName("production_companies")
     @Expose
     public List<CompanyModel> production_companies;

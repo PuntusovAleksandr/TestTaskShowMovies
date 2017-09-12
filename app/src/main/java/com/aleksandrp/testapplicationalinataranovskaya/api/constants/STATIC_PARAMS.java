@@ -16,5 +16,6 @@ public class STATIC_PARAMS {
     public static final String EXTRA_PAGE = "EXTRA_PAGE";
     public static final String EXTRA_SEARCH = "EXTRA_SEARCH";
     public static final String EXTRA_GENRES_ID = "EXTRA_GENRES_ID";
+    public static final String EXTRA_ID_MOVE = "EXTRA_ID_MOVE";
 
 }

@@ -5,6 +5,7 @@ import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
 import com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkResponseEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.interfaces.ServiceTask;
+import com.aleksandrp.testapplicationalinataranovskaya.api.model.FullInfoMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListGenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 
@@ -29,7 +30,7 @@ public class ApiMoveHelper {
     }
 
     public void getListPopular(int mPage, String mGenres) {
-        restAdapter.init(true, "getListPopular");
+        restAdapter.init(false, "getListPopular");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListMoveModel>> allSources =
@@ -76,7 +77,7 @@ public class ApiMoveHelper {
 
 
     public void getListGenres() {
-        restAdapter.init(true, "getListGenres");
+        restAdapter.init(false, "getListGenres");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListGenresModel>> allSources =
@@ -123,7 +124,7 @@ public class ApiMoveHelper {
 
 
     public void searchMovies(String mSearch) {
-        restAdapter.init(true, "searchMovies");
+        restAdapter.init(false, "searchMovies");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListMoveModel>> allSources =
@@ -164,6 +165,54 @@ public class ApiMoveHelper {
                             event.setId(ApiConstants.SEARCH_MOVE);
                             body = mResponse.body();
                         }
+                    }
+                });
+    }
+
+    public void getDetailsMove(long mId) {
+        restAdapter.init(false, "getDetailsMove");
+        ServiceTask serviceUser =
+                restAdapter.getRetrofit().create(ServiceTask.class);
+        Observable<Response<FullInfoMoveModel>> allSources =
+                serviceUser.getPrimaryInfo(mId, API_KEY);
+        allSources.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Response<FullInfoMoveModel>>() {
+                    private NetworkResponseEvent event;
+                    private NetworkResponseEvent<String> eventError;
+                    private FullInfoMoveModel body;
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        eventError = new NetworkResponseEvent<>();
+                        eventError.setId(ApiConstants.ERROR);
+                        eventError.setData("Error load Sources ::: " + e.getMessage());
+                        eventError.setSucess(false);
+                        BusProvider.send(eventError);
+                    }
+
+                    @Override
+                    public void onNext(Response<FullInfoMoveModel> mResponse) {
+                        if (mResponse.isSuccessful()) {
+                            event = new NetworkResponseEvent<>();
+                            event.setId(ApiConstants.GET_MOVE_INFO);
+                            body = mResponse.body();
+                        }
+                        if (event != null) {
+                            event.setSucess(true);
+                            event.setData(body);
+                        } else {
+                            event = new NetworkResponseEvent<>();
+                            event.setId(ApiConstants.ERROR);
+                            event.setData(mResponse.code() +"");
+                            event.setSucess(false);
+                        }
+                        BusProvider.send(event);
                     }
                 });
     }

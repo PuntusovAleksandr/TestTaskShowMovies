@@ -35,11 +35,19 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Search"
             android:windowSoftInputMode="stateAlwaysVisible"/>
+        <activity
+            android:name=".activity.DetailsMoveActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|keyboard"
+            android:label="@string/move_details"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Search"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
 
         <service
             android:name=".api.service.ServiceApi"
             android:enabled="true"
             android:exported="false"/>
+
     </application>
 
 </manifest>

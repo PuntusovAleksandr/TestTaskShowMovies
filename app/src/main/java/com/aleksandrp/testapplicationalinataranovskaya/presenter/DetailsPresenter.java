@@ -1,24 +1,24 @@
 package com.aleksandrp.testapplicationalinataranovskaya.presenter;
 
-import com.aleksandrp.testapplicationalinataranovskaya.activity.SearchActivity;
+import com.aleksandrp.testapplicationalinataranovskaya.activity.DetailsMoveActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkFailEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.UpdateUiEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
+import com.aleksandrp.testapplicationalinataranovskaya.api.model.FullInfoMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.PresenterEventListener;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_SEARCH_MOVE;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.SEARCH_MOVE;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.GET_MOVE_INFO;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_GET_MOVE_INFO;
 
 /**
  * Created by AleksandrP on 12.09.2017.
  */
 
-public class SearchPresenter extends BasePresenter implements PresenterEventListener {
+public class DetailsPresenter extends BasePresenter implements PresenterEventListener {
 
 
     private Subscriber subscriber;
@@ -44,8 +44,8 @@ public class SearchPresenter extends BasePresenter implements PresenterEventList
                 if (mO instanceof UpdateUiEvent) {
                     UpdateUiEvent event = (UpdateUiEvent) mO;
                     Object data = event.getData();
-                    if (event.getId() == RESPONSE_SEARCH_MOVE) {
-                        showListMovies((ListMoveModel) data);
+                    if (event.getId() == RESPONSE_GET_MOVE_INFO) {
+                        showDetails((FullInfoMoveModel) data);
                     }
                 } else if (mO instanceof NetworkFailEvent) {
                     NetworkFailEvent event = (NetworkFailEvent) mO;
@@ -74,15 +74,15 @@ public class SearchPresenter extends BasePresenter implements PresenterEventList
 
     public void showMessageError(String mData) {
         try {
-            ((SearchActivity) mvpView).showMessageError(mData);
+            ((DetailsMoveActivity) mvpView).showMessageError(mData);
         } catch (Exception mE) {
             mE.printStackTrace();
         }
     }
 
-    public void showListMovies(ListMoveModel mData) {
+    public void showDetails(FullInfoMoveModel mData) {
         try {
-            ((SearchActivity) mvpView).showListFilter(mData);
+            ((DetailsMoveActivity) mvpView).showDetails(mData);
         } catch (Exception mE) {
             mE.printStackTrace();
         }
@@ -90,9 +90,9 @@ public class SearchPresenter extends BasePresenter implements PresenterEventList
 
     //================================================
 
-    public void searchMovies(String search) {
+    public void getDetailsMove(long id) {
         final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(SEARCH_MOVE);
-        ((SearchActivity) mvpView).makeRequest(mEvent, search);
+        mEvent.setId(GET_MOVE_INFO);
+        ((DetailsMoveActivity) mvpView).makeRequest(mEvent, id);
     }
 }

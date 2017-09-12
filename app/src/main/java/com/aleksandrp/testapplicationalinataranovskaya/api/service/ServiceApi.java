@@ -18,6 +18,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_GENRES_ID;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_ID_MOVE;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_PAGE;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_SEARCH;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.SERVICE_JOB_ID_TITLE;
@@ -102,6 +103,7 @@ public class ServiceApi extends Service {
         int page = intent.getIntExtra(EXTRA_PAGE, 1);
         String search = intent.getStringExtra(EXTRA_SEARCH);
         String genres = intent.getStringExtra(EXTRA_GENRES_ID);
+        long id = intent.getLongExtra(EXTRA_ID_MOVE, -1);
         switch (jobId) {
             //
             case ApiConstants.LIST_POPULAR:
@@ -112,6 +114,9 @@ public class ServiceApi extends Service {
                 break;
             case ApiConstants.SEARCH_MOVE:
                 mMoveHelper.searchMovies(search);
+                break;
+            case ApiConstants.GET_MOVE_INFO:
+                mMoveHelper.getDetailsMove(id);
                 break;
         }
         return START_NOT_STICKY;
@@ -134,6 +139,9 @@ public class ServiceApi extends Service {
             case ApiConstants.SEARCH_MOVE:
                 updateUiEvent.setId(ApiConstants.RESPONSE_SEARCH_MOVE);
                 break;
+            case ApiConstants.GET_MOVE_INFO:
+                updateUiEvent.setId(ApiConstants.RESPONSE_GET_MOVE_INFO);
+                break;
 
         }
         if (updateUiEvent != null) {
@@ -143,14 +151,20 @@ public class ServiceApi extends Service {
     }
 
     private void requestFailed(NetworkResponseEvent event) {
-
+        String error = "Error request";
         NetworkFailEvent networkFailEvent = new NetworkFailEvent();
         if (event.getId() == ApiConstants.ERROR) {
             String data = (String) event.getData();
-            if (data.isEmpty()) data = App.getContext().getString(R.string.bad_internet);
+            if (data != null && data.isEmpty()) {
+                data = App.getContext().getString(R.string.bad_internet);
+            } else  if (data != null && !data.isEmpty() && data.contains("404")) {
+                data = "The resource you requested could not be found";
+            } else {
+                data = error;
+            }
             networkFailEvent.setMessage(data);
         } else {
-            networkFailEvent.setMessage("Error request");
+            networkFailEvent.setMessage(error);
         }
         BusProvider.send(networkFailEvent);
         Log.d("ID_SERVICE", "requestFailed ID_SERVICE " + startId);

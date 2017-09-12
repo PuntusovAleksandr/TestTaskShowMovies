@@ -1,6 +1,7 @@
 package com.aleksandrp.testapplicationalinataranovskaya.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.aleksandrp.testapplicationalinataranovskaya.R;
+import com.aleksandrp.testapplicationalinataranovskaya.activity.DetailsMoveActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.MoveModel;
 
@@ -21,6 +23,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.RestAdapter.API_BASE_URL_IMAGE;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_ID_MOVE;
 import static com.aleksandrp.testapplicationalinataranovskaya.utils.ShowImage.showImageFromFile;
 
 /**
@@ -30,8 +33,10 @@ import static com.aleksandrp.testapplicationalinataranovskaya.utils.ShowImage.sh
 public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<MoveModel> mItemMoves;
+    private Context mActivity;
 
     public MoviesListAdapter(Context mActivity) {
+        this.mActivity = mActivity;
         mItemMoves = new ArrayList<>();
     }
 
@@ -69,6 +74,15 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     API_BASE_URL_IMAGE + model.poster_path,
                     ((ContentHolder) holder).iv_icon_from_call);
 
+            ((ContentHolder) holder).cv_item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View mView) {
+                    Intent intent = new Intent(mActivity, DetailsMoveActivity.class);
+                    intent.putExtra(EXTRA_ID_MOVE, model.id);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mActivity.startActivity(intent);
+                }
+            });
         }
     }
 
