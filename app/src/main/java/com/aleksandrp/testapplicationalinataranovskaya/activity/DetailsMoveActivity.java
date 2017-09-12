@@ -106,9 +106,15 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
     @Override
     protected void onStart() {
         super.onStart();
+        showProgress(true);
         mPresenter.registerSubscriber();
         if (idMove > 0) {
-            mPresenter.getDetailsMove(idMove);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mPresenter.getDetailsMove(idMove);
+                }
+            }, 750);
         }
     }
 
@@ -164,7 +170,7 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
         if ((mData.contains("The resource you requested could not be found")) ||
                 (mData.toLowerCase().contains("error"))) {
             finish();
-        }else {
+        } else {
             showProgress(false);
         }
         ShowToast.showMessageError(mData);
@@ -193,6 +199,7 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
             tv_genres.setText(genre);
         }
     }
+
     public void saveMoveInDb(boolean isSave) {
         MoveModelDb modelDb = new MoveModelDb();
         modelDb.setId(mData.id);

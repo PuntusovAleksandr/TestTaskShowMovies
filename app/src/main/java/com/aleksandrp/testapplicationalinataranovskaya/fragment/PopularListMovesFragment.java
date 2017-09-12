@@ -28,12 +28,16 @@ public class PopularListMovesFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                ((MainActivity) getActivity()).getLostMoves();
+                try {
+                    ((MainActivity) getActivity()).getLostMoves();
+                } catch (Exception mE) {
+                    mE.printStackTrace();
+                }
             }
         }, 750);
     }

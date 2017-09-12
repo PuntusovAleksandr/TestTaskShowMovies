@@ -149,6 +149,10 @@ public class SearchActivity extends AppCompatActivity implements MvpActionView {
     }
 
 
+    public void makeStopService() {
+        stopService(serviceIntent);
+    }
+
     //    ===========================================
 
     public void showProgress(boolean mShowPhone) {

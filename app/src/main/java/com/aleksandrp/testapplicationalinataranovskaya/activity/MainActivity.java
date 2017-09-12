@@ -198,6 +198,10 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
         ShowToast.showMessageError(mData);
     }
 
+    public void makeStopService() {
+        stopService(serviceIntent);
+    }
+
 
     public interface UpdatePopular {
         void updateList(ListMoveModel mData);

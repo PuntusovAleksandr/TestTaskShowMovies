@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.aleksandrp.testapplicationalinataranovskaya.R;
 import com.aleksandrp.testapplicationalinataranovskaya.activity.DetailsMoveActivity;
+import com.aleksandrp.testapplicationalinataranovskaya.activity.MainActivity;
+import com.aleksandrp.testapplicationalinataranovskaya.activity.SearchActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.MoveModel;
 
@@ -77,6 +79,7 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((ContentHolder) holder).cv_item.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View mView) {
+                    stopService();
                     Intent intent = new Intent(mActivity, DetailsMoveActivity.class);
                     intent.putExtra(EXTRA_ID_MOVE, model.id);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -85,6 +88,20 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
         }
     }
+
+    public void stopService() {
+        try {
+            ((MainActivity) mActivity).makeStopService();
+        } catch (Exception mE) {
+            mE.printStackTrace();
+        }
+        try {
+            ((SearchActivity) mActivity).makeStopService();
+        } catch (Exception mE) {
+            mE.printStackTrace();
+        }
+    }
+
 
     @Override
     public int getItemCount() {
