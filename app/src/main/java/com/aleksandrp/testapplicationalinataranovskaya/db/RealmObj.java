@@ -9,6 +9,7 @@ import com.aleksandrp.testapplicationalinataranovskaya.presenter.DetailsPresente
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 
 /**
  * Created by AleksandrP on 12.09.2017.
@@ -92,4 +93,10 @@ public class RealmObj {
                 });
     }
 
+    public RealmResults<MoveModelDb> getMoveModelDb() {
+        return realm
+                .where(MoveModelDb.class)
+                .equalTo("save", true)
+                .findAll();
+    }
 }
