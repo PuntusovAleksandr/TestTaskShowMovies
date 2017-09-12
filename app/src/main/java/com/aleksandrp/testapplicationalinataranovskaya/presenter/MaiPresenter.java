@@ -110,13 +110,19 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
     public void getListGenres() {
         final NetworkRequestEvent mEvent = new NetworkRequestEvent();
         mEvent.setId(LIST_OFFICIAL);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, null);
+        ((MainActivity) mvpView).makeRequest(mEvent, null, null, 1);
     }
 
     public void getLostMoves(String genres) {
         final NetworkRequestEvent mEvent = new NetworkRequestEvent();
         mEvent.setId(LIST_POPULAR);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, genres);
+        ((MainActivity) mvpView).makeRequest(mEvent, null, genres, 1);
+    }
+
+    public void getLostMoves(String genres, int current_page) {
+        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
+        mEvent.setId(LIST_POPULAR);
+        ((MainActivity) mvpView).makeRequest(mEvent, null, genres, current_page);
     }
 
 }

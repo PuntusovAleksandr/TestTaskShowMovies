@@ -27,6 +27,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_GENRES_ID;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_PAGE;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_SEARCH;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.SERVICE_JOB_ID_TITLE;
 import static com.aleksandrp.testapplicationalinataranovskaya.utils.InternetUtils.checkInternetConnection;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
     private FilterDialog mFilterDialog;
 
     private String genres;
+
+    private int current_page = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,18 +153,20 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
 
     //    ===========================================
 
-    public void makeRequest(NetworkRequestEvent mEvent, String mSearch, String filter) {
+    public void makeRequest(NetworkRequestEvent mEvent, String mSearch, String filter, int current_page) {
         showProgress(true);
         serviceIntent.putExtra(SERVICE_JOB_ID_TITLE, mEvent.getId());
         serviceIntent.putExtra(EXTRA_SEARCH, mSearch);
         serviceIntent.putExtra(EXTRA_GENRES_ID, filter);
+        serviceIntent.putExtra(EXTRA_PAGE, current_page);
         startService(serviceIntent);
     }
 
     //    ===========================================
-    public void getLostMoves() {
+    public void getLostMoves(int mCurrent_page) {
+        this.current_page = mCurrent_page;
         if (checkInternetConnection()) {
-            mPresenter.getLostMoves(genres);
+            mPresenter.getLostMoves(genres, current_page);
         } else {
             showMessageError(App.getContext().getString(R.string.no_internet));
         }
@@ -179,7 +184,11 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
     public void showListPopular(ListMoveModel mData) {
         showProgress(false);
         if (mUpdatePopular != null) {
-            mUpdatePopular.updateList(mData);
+            if (mData.page < 2) {
+                mUpdatePopular.updateList(mData);
+            } else {
+                mUpdatePopular.updateListMore(mData);
+            }
         }
     }
 

@@ -41,6 +41,9 @@ public class BaseFragment extends Fragment {
     public MoviesListAdapter adapter;
     public LinearLayoutManager linearLayoutManager;
 
+    public int carentPage;
+    public int totalPages;
+
     public BaseFragment() {
     }
 
@@ -79,22 +82,15 @@ public class BaseFragment extends Fragment {
             if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                     && firstVisibleItemPosition >= 0
                     && totalItemCount >= PAGE_SIZE) {
-//                if (mPayloadHistory != null && progressBar_registration.getVisibility() != View.VISIBLE) {
-//                    PayloadHistory.AllHistory data = mPayloadHistory.getPayload().getData();
-//                    if (data != null) {
-//                        int current_page = data.current_page;
-//                        if (current_page < data.total)
-//                            loadMoreChatItems(current_page + 1);
-//                    }
-//                    PayloadHistory.AllHistory orders = mPayloadHistory.getPayload().orders;
-//                    if (orders != null) {
-//                        int current_page = orders.current_page;
-//                        if (current_page < orders.total)
-//                            loadMoreChatItems(current_page + 1);
-//                    }
-//                }
-            }
 
+                if (carentPage < totalPages) {
+                    loadMoreChatItems(carentPage + 1);
+                }
+            }
         }
     };
+
+    public void loadMoreChatItems(int current_page) {
+
+    }
 }

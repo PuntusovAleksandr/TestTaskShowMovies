@@ -7,12 +7,16 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.aleksandrp.testapplicationalinataranovskaya.App;
 import com.aleksandrp.testapplicationalinataranovskaya.R;
 import com.aleksandrp.testapplicationalinataranovskaya.activity.MainActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.activity.SearchActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 
 import butterknife.OnClick;
+
+import static com.aleksandrp.testapplicationalinataranovskaya.utils.InternetUtils.checkInternetConnection;
+import static com.aleksandrp.testapplicationalinataranovskaya.utils.ShowToast.showMessageError;
 
 /**
  * Created by AleksandrP on 11.09.2017.
@@ -23,6 +27,7 @@ public class PopularListMovesFragment extends BaseFragment {
 
 
     private Handler mUiHandler = new Handler();
+    private int current_page = 1;
 
     public PopularListMovesFragment() {
     }
@@ -34,7 +39,7 @@ public class PopularListMovesFragment extends BaseFragment {
             @Override
             public void run() {
                 try {
-                    ((MainActivity) getActivity()).getLostMoves();
+                    ((MainActivity) getActivity()).getLostMoves(current_page);
                 } catch (Exception mE) {
                     mE.printStackTrace();
                 }
@@ -45,15 +50,20 @@ public class PopularListMovesFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        carentPage = 1;
+        totalPages = 1;
         ((MainActivity) getActivity()).setListenerPopular(new MainActivity.UpdatePopular() {
             @Override
             public void updateList(ListMoveModel mData) {
+                carentPage = mData.page;
+                totalPages = mData.total_pages;
                 adapter.addAll(mData);
             }
 
             @Override
             public void updateListMore(ListMoveModel mData) {
+                carentPage = mData.page;
+                totalPages = mData.total_pages;
                 adapter.addAllMore(mData);
             }
         });
@@ -88,4 +98,17 @@ public class PopularListMovesFragment extends BaseFragment {
         startActivity(intent);
     }
 
+    @Override
+    public void loadMoreChatItems(int current_page) {
+        this.current_page = current_page;
+        if (checkInternetConnection()) {
+            try {
+                ((MainActivity) getActivity()).getLostMoves(current_page);
+            } catch (Exception mE) {
+                mE.printStackTrace();
+            }
+        } else {
+            showMessageError(App.getContext().getString(R.string.no_internet));
+        }
+    }
 }
