@@ -2,28 +2,25 @@ package com.aleksandrp.testapplicationalinataranovskaya.presenter;
 
 import android.support.v4.app.FragmentManager;
 
-import com.aleksandrp.testapplicationalinataranovskaya.activity.MainActivity;
+import com.aleksandrp.testapplicationalinataranovskaya.activity.SearchActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkFailEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.event.UpdateUiEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListGenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.PresenterEventListener;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_OFFICIAL;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_POPULAR;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_OFFICIAL;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_POPULAR;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_SEARCH_MOVE;
+import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.SEARCH_MOVE;
 
 /**
- * Created by AleksandrP on 11.09.2017.
+ * Created by AleksandrP on 12.09.2017.
  */
 
-public class MaiPresenter extends BasePresenter implements PresenterEventListener {
+public class SearchPresenter extends BasePresenter implements PresenterEventListener {
 
 
     private Subscriber subscriber;
@@ -56,10 +53,8 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
                 if (mO instanceof UpdateUiEvent) {
                     UpdateUiEvent event = (UpdateUiEvent) mO;
                     Object data = event.getData();
-                    if (event.getId() == RESPONSE_LIST_POPULAR) {
-                        showListPopular((ListMoveModel) data);
-                    } else if (event.getId() == RESPONSE_LIST_OFFICIAL) {
-                        showGenres((ListGenresModel) data);
+                    if (event.getId() == RESPONSE_SEARCH_MOVE) {
+                        showListMovies((ListMoveModel) data);
                     }
                 } else if (mO instanceof NetworkFailEvent) {
                     NetworkFailEvent event = (NetworkFailEvent) mO;
@@ -88,35 +83,25 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
 
     public void showMessageError(String mData) {
         try {
-            ((MainActivity) mvpView).showMessageError(mData);
+            ((SearchActivity) mvpView).showMessageError(mData);
         } catch (Exception mE) {
             mE.printStackTrace();
         }
     }
 
-    public void showListPopular(ListMoveModel mData) {
+    public void showListMovies(ListMoveModel mData) {
         try {
-            ((MainActivity) mvpView).showListPopular(mData);
+            ((SearchActivity) mvpView).showListFilter(mData);
         } catch (Exception mE) {
             mE.printStackTrace();
         }
     }
 
-    public void showGenres(ListGenresModel mData) {
-        ((MainActivity) mvpView).showGenres(mData.genres);
-    }
     //================================================
 
-    public void getListGenres() {
+    public void searchMovies(String search) {
         final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(LIST_OFFICIAL);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, null);
+        mEvent.setId(SEARCH_MOVE);
+        ((SearchActivity) mvpView).makeRequest(mEvent, search);
     }
-
-    public void getLostMoves(String genres) {
-        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(LIST_POPULAR);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, genres);
-    }
-
 }

@@ -19,12 +19,4 @@
         android:padding="@dimen/_4dp"
         android:textSize="@dimen/_16sp"/>
 
-    <ImageView
-        android:id="@+id/iv_filter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:padding="@dimen/_4dp"
-        android:src="@drawable/ic_filter_"/>
-
 </LinearLayout>

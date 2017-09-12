@@ -11,7 +11,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.aleksandrp.testapplicationalinataranovskaya.R;
-import com.aleksandrp.testapplicationalinataranovskaya.activity.MainActivity;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.MoveModel;
 
@@ -31,11 +30,9 @@ import static com.aleksandrp.testapplicationalinataranovskaya.utils.ShowImage.sh
 public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<MoveModel> mItemMoves;
-    private MainActivity mActivity;
 
     public MoviesListAdapter(Context mActivity) {
         mItemMoves = new ArrayList<>();
-        this.mActivity = (MainActivity) mActivity;
     }
 
     public void addAll(ListMoveModel mListMoveModel) {
@@ -83,7 +80,6 @@ public class MoviesListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
         return size;
     }
-
 
     static class ContentHolder extends RecyclerView.ViewHolder {
         @Nullable

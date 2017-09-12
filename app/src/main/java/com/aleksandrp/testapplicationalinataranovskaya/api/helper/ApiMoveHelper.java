@@ -76,7 +76,7 @@ public class ApiMoveHelper {
 
 
     public void getListGenres() {
-        restAdapter.init(true, "getListPopular");
+        restAdapter.init(true, "getListGenres");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListGenresModel>> allSources =
@@ -123,7 +123,7 @@ public class ApiMoveHelper {
 
 
     public void searchMovies(String mSearch) {
-        restAdapter.init(true, "getListPopular");
+        restAdapter.init(true, "searchMovies");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListMoveModel>> allSources =
@@ -161,7 +161,7 @@ public class ApiMoveHelper {
                     public void onNext(Response<ListMoveModel> mResponse) {
                         if (mResponse.isSuccessful()) {
                             event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.LIST_POPULAR);
+                            event.setId(ApiConstants.SEARCH_MOVE);
                             body = mResponse.body();
                         }
                     }

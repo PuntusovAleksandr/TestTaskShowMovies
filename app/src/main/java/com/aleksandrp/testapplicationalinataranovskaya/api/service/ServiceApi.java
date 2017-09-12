@@ -131,6 +131,9 @@ public class ServiceApi extends Service {
             case ApiConstants.LIST_OFFICIAL:
                 updateUiEvent.setId(ApiConstants.RESPONSE_LIST_OFFICIAL);
                 break;
+            case ApiConstants.SEARCH_MOVE:
+                updateUiEvent.setId(ApiConstants.RESPONSE_SEARCH_MOVE);
+                break;
 
         }
         if (updateUiEvent != null) {
