@@ -9,4 +9,6 @@
     <string name="cancel">Cancel</string>
     <string name="search_activity">Search movies</string>
     <string name="move_details">Move details</string>
+    <string name="data_update">Data update</string>
+    <string name="error_data_update">Error data update</string>
 </resources>

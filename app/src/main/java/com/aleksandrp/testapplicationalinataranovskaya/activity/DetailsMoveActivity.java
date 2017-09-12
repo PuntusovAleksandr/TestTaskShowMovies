@@ -2,6 +2,7 @@ package com.aleksandrp.testapplicationalinataranovskaya.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,14 +14,19 @@ import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestE
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.FullInfoMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.GenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.service.ServiceApi;
+import com.aleksandrp.testapplicationalinataranovskaya.db.RealmObj;
+import com.aleksandrp.testapplicationalinataranovskaya.db.models.MoveModelDb;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.DetailsPresenter;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.MvpActionView;
 import com.aleksandrp.testapplicationalinataranovskaya.utils.ShowToast;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.RestAdapter.API_BASE_URL_IMAGE;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_ID_MOVE;
@@ -49,10 +55,22 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
     TextView tv_genres;
 
 
+    @Bind(R.id.menu_fab)
+    FloatingActionMenu menu_fab;
+
+    @Bind(R.id.fab_save)
+    FloatingActionButton fab_save;
+    @Bind(R.id.fab_deleter)
+    FloatingActionButton fab_deleter;
+
+
     private Intent serviceIntent;
     private DetailsPresenter mPresenter;
 
+    private Handler mUiHandler = new Handler();
+
     private long idMove;
+    private FullInfoMoveModel mData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +84,22 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
         mPresenter.init();
 
         idMove = getIntent().getLongExtra(EXTRA_ID_MOVE, -1);
+
+        menu_fab.hideMenuButton(false);
+        menu_fab.setClosedOnTouchOutside(true);
+        menu_fab.setOnMenuButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menu_fab.toggle(true);
+            }
+        });
+
+        mUiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                menu_fab.showMenuButton(true);
+            }
+        }, 400);
     }
 
 
@@ -93,6 +127,20 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
         stopService(serviceIntent);
         super.onDestroy();
     }
+    //    ===========================================
+
+    @OnClick(R.id.fab_save)
+    public void fab_saveClick() {
+        saveMoveInDb(true);
+        menu_fab.toggle(true);
+    }
+
+    @OnClick(R.id.fab_deleter)
+    public void fab_deleterClick() {
+        saveMoveInDb(false);
+        menu_fab.toggle(true);
+    }
+
     //    ===========================================
 
     public void makeRequest(NetworkRequestEvent mEvent, long id) {
@@ -123,6 +171,7 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
     }
 
     public void showDetails(FullInfoMoveModel mData) {
+        this.mData = mData;
         showProgress(false);
         if (mData != null) {
 
@@ -143,5 +192,15 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
             tv_vote_count.setText("Vte count: " + mData.vote_count);
             tv_genres.setText(genre);
         }
+    }
+    public void saveMoveInDb(boolean isSave) {
+        MoveModelDb modelDb = new MoveModelDb();
+        modelDb.setId(mData.id);
+        modelDb.setPoster_path(mData.poster_path);
+        modelDb.setTitle(mData.title);
+        modelDb.setOverview(mData.overview);
+        modelDb.setSave(isSave);
+
+        RealmObj.getInstance().updateMove(modelDb, mPresenter);
     }
 }
