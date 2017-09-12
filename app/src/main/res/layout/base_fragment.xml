@@ -23,7 +23,7 @@
         android:paddingBottom="@dimen/_10dp"
         android:paddingLeft="@dimen/_10dp"
         android:paddingRight="@dimen/_10dp"
-        fab:menu_backgroundColor="#ccffffff"
+        fab:menu_colorNormal="@color/colorAccent"
         fab:menu_labels_ellipsize="end"
         fab:menu_labels_singleLine="true">
 

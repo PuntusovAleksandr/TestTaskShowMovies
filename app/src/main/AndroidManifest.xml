@@ -33,6 +33,7 @@
             android:label="@string/search_activity"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Search"
             android:windowSoftInputMode="stateAlwaysVisible"/>
 
         <service
