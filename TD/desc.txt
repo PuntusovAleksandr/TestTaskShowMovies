@@ -1,0 +1,43 @@
+API
+api_key=fbe4e6280f6a460beaad8ebe2bc130ac
+Get list of populars movies:
+https://api.themoviedb.org/3/discover/movie?sort_by=popularity.des
+page (integer / optional) - Specify the page of results to query
+with_genres (string / optional) - Comma separated value of genre ids that you want to include in the results.
+Get the list of official genres for movies.
+	https://api.themoviedb.org/3/genre/movie/list
+Search for movies.
+	https://api.themoviedb.org/3/search/movie
+query (string / required / minLength: 1) - Pass a text query to search. This value should be URI encoded.
+Get the primary information about a movie.
+	https://api.themoviedb.org/3/movie/{movie_id}
+Example how to get image
+https://image.tmdb.org/t/p/w500/nl79FQ8xWZkhL3rDr1v2RFFR6J0.jpg
+Экраны
+Main – экран с двумя вкладками и выбранным жанром:
+List of popular movies with pagination.
+List of favorite movies.
+  		Отобразить:	 poster_path, title, overview
+Genre selection. Фильтрация списков фильмов, можно выбрать больше одного, открывается с экрана 1.
+Search for movies. Открывается с экрана 1.
+		Отобразить:	 poster_path, title, release_date
+Movie details. Открывается с экранов 1, 3. На нем кнопка сохранения, удаления.
+		Отобразить:	 poster_path, title, overview, release_date, vote_average, vote_count, genres
+Требования
+Material Theme
+JavaRx как промежуточный слой между интерфейсом и данными
+Dependency Injection (Dagger 2)
+MVP
+Data Base (желательно Realm)
+Retrofit
+Google Support Support libraries
+Будет плюсом
+Data Binding
+Constraint Layout
+Cache server data in the memory and database.
+Pull-to-refresh to refresh movie list.
+Unit Tests
+
+
+
+
