@@ -1,87 +1,29 @@
 package com.aleksandrp.testapplicationalinataranovskaya.presenter;
 
-import android.support.v4.app.FragmentManager;
-
 import com.aleksandrp.testapplicationalinataranovskaya.activity.MainActivity;
-import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkFailEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.UpdateUiEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.helper.ApiMoveHelper;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListGenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
-import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.PresenterEventListener;
+import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.MvpView;
 
+import javax.inject.Inject;
+
+import retrofit2.Response;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_OFFICIAL;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.LIST_POPULAR;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_OFFICIAL;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_LIST_POPULAR;
 
 /**
  * Created by AleksandrP on 11.09.2017.
  */
 
-public class MaiPresenter extends BasePresenter implements PresenterEventListener {
+public class MaiPresenter {
 
+    private MvpView mvpView;
+    private ApiMoveHelper apiHelper;
 
-    private Subscriber subscriber;
-    private FragmentManager mFragmentManager;
-    private boolean isWork;
-
-    public void initFragmentManager(FragmentManager mFragmentManager, boolean isWork) {
-        this.mFragmentManager = mFragmentManager;
-        this.isWork = isWork;
-    }
-
-    @Override
-    public void init() {
-
-    }
-
-    @Override
-    public void registerSubscriber() {
-        subscriber = new Subscriber() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onNext(Object mO) {
-                if (mO instanceof UpdateUiEvent) {
-                    UpdateUiEvent event = (UpdateUiEvent) mO;
-                    Object data = event.getData();
-                    if (event.getId() == RESPONSE_LIST_POPULAR) {
-                        showListPopular((ListMoveModel) data);
-                    } else if (event.getId() == RESPONSE_LIST_OFFICIAL) {
-                        showGenres((ListGenresModel) data);
-                    }
-                } else if (mO instanceof NetworkFailEvent) {
-                    NetworkFailEvent event = (NetworkFailEvent) mO;
-                    showMessageError(event.getMessage());
-                }
-            }
-        };
-        BusProvider.observe().observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
-    }
-
-    //================================================
-    @Override
-    public void unRegisterSubscriber() {
-        if (subscriber != null && !subscriber.isUnsubscribed()) {
-            subscriber.unsubscribe();
-        }
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        subscriber = null;
+    @Inject
+    public MaiPresenter(ApiMoveHelper mApiHelper, MvpView mMvpView) {
+        this.mvpView = mMvpView;
+        this.apiHelper = mApiHelper;
     }
 
     //================================================
@@ -108,21 +50,69 @@ public class MaiPresenter extends BasePresenter implements PresenterEventListene
     //================================================
 
     public void getListGenres() {
-        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(LIST_OFFICIAL);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, null, 1);
+        showDialog();
+        apiHelper.getListGenres()
+                .subscribe(new Subscriber<Response<ListGenresModel>>() {
+                    private ListGenresModel body;
+
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showMessageError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Response<ListGenresModel> mResponse) {
+                        if (mResponse.isSuccessful()) {
+                            body = mResponse.body();
+                            showGenres(body);
+                        } else {
+                            showMessageError(mResponse.message());
+                        }
+                    }
+                });
     }
 
     public void getLostMoves(String genres) {
-        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(LIST_POPULAR);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, genres, 1);
+        getLostMoves(genres, 1);
     }
 
     public void getLostMoves(String genres, int current_page) {
-        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(LIST_POPULAR);
-        ((MainActivity) mvpView).makeRequest(mEvent, null, genres, current_page);
+        showDialog();
+        apiHelper.getListPopular(current_page, genres)
+                .subscribe(new Subscriber<Response<ListMoveModel>>() {
+                    private ListMoveModel body;
+
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showMessageError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Response<ListMoveModel> mResponse) {
+                        if (mResponse.isSuccessful()) {
+                            body = mResponse.body();
+                            showListPopular(body);
+                        } else {
+                            showMessageError(mResponse.message());
+                        }
+                    }
+                });
+    }
+
+    private void showDialog() {
+        try {
+            ((MainActivity) mvpView).showProgress(true);
+        } catch (Exception mE) {
+            mE.printStackTrace();
+        }
     }
 
 }

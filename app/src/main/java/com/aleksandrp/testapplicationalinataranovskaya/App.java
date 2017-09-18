@@ -5,6 +5,10 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.aleksandrp.testapplicationalinataranovskaya.di.AppComponent;
+import com.aleksandrp.testapplicationalinataranovskaya.di.DaggerAppComponent;
+import com.aleksandrp.testapplicationalinataranovskaya.di.modulies.AppModule;
+
 /**
  * Created by AleksandrP on 11.09.2017.
  */
@@ -14,6 +18,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
     public static final String TAG = App.class.getSimpleName();
 
     private static Context context;
+    private AppComponent appComponent;
 
     @Override
     public void onCreate() {
@@ -21,10 +26,18 @@ public class App extends Application implements Application.ActivityLifecycleCal
         App.context = this.getApplicationContext();
         registerActivityLifecycleCallbacks(this);
 
+        appComponent = DaggerAppComponent
+                .builder()
+                .appModule(new AppModule(this))
+                .build();
     }
 
     public static Context getContext() {
         return context;
+    }
+
+    public AppComponent getAppComponent() {
+        return appComponent;
     }
 
     @Override

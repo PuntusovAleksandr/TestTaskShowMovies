@@ -1,73 +1,28 @@
 package com.aleksandrp.testapplicationalinataranovskaya.presenter;
 
 import com.aleksandrp.testapplicationalinataranovskaya.activity.SearchActivity;
-import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkFailEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.UpdateUiEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.helper.ApiMoveHelper;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
-import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.PresenterEventListener;
+import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.MvpView;
 
+import javax.inject.Inject;
+
+import retrofit2.Response;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_SEARCH_MOVE;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.SEARCH_MOVE;
 
 /**
  * Created by AleksandrP on 12.09.2017.
  */
 
-public class SearchPresenter extends BasePresenter implements PresenterEventListener {
+public class SearchPresenter {
 
+    private MvpView mvpView;
+    private ApiMoveHelper apiHelper;
 
-    private Subscriber subscriber;
-
-    @Override
-    public void init() {
-
-    }
-
-    @Override
-    public void registerSubscriber() {
-        subscriber = new Subscriber() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onNext(Object mO) {
-                if (mO instanceof UpdateUiEvent) {
-                    UpdateUiEvent event = (UpdateUiEvent) mO;
-                    Object data = event.getData();
-                    if (event.getId() == RESPONSE_SEARCH_MOVE) {
-                        showListMovies((ListMoveModel) data);
-                    }
-                } else if (mO instanceof NetworkFailEvent) {
-                    NetworkFailEvent event = (NetworkFailEvent) mO;
-                    showMessageError(event.getMessage());
-                }
-            }
-        };
-        BusProvider.observe().observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
-    }
-
-    //================================================
-    @Override
-    public void unRegisterSubscriber() {
-        if (subscriber != null && !subscriber.isUnsubscribed()) {
-            subscriber.unsubscribe();
-        }
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        subscriber = null;
+    @Inject
+    public SearchPresenter(ApiMoveHelper mApiHelper, MvpView mMvpView) {
+        this.mvpView = mMvpView;
+        this.apiHelper = mApiHelper;
     }
 
     //================================================
@@ -91,8 +46,37 @@ public class SearchPresenter extends BasePresenter implements PresenterEventList
     //================================================
 
     public void searchMovies(String search) {
-        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(SEARCH_MOVE);
-        ((SearchActivity) mvpView).makeRequest(mEvent, search);
+        showDialog();
+        apiHelper.searchMovies(search)
+                .subscribe(new Subscriber<Response<ListMoveModel>>() {
+                    private ListMoveModel body;
+
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showMessageError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Response<ListMoveModel> mResponse) {
+                        if (mResponse.isSuccessful()) {
+                            body = mResponse.body();
+                            showListMovies(body);
+                        } else {
+                            showMessageError(mResponse.message());
+                        }
+                    }
+                });
+    }
+
+    private void showDialog() {
+        try {
+            ((SearchActivity) mvpView).showProgress(true);
+        } catch (Exception mE) {
+            mE.printStackTrace();
+        }
     }
 }

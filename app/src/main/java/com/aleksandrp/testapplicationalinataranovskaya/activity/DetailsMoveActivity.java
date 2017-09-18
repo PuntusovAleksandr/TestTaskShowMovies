@@ -1,6 +1,5 @@
 package com.aleksandrp.testapplicationalinataranovskaya.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -9,13 +8,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.aleksandrp.testapplicationalinataranovskaya.App;
 import com.aleksandrp.testapplicationalinataranovskaya.R;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.FullInfoMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.GenresModel;
-import com.aleksandrp.testapplicationalinataranovskaya.api.service.ServiceApi;
 import com.aleksandrp.testapplicationalinataranovskaya.db.RealmObj;
 import com.aleksandrp.testapplicationalinataranovskaya.db.models.MoveModelDb;
+import com.aleksandrp.testapplicationalinataranovskaya.di.DetailsActivityComponent;
+import com.aleksandrp.testapplicationalinataranovskaya.di.modulies.DetailsActivityModule;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.DetailsPresenter;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.MvpActionView;
 import com.aleksandrp.testapplicationalinataranovskaya.utils.ShowToast;
@@ -24,13 +24,14 @@ import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.RestAdapter.API_BASE_URL_IMAGE;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_ID_MOVE;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.SERVICE_JOB_ID_TITLE;
 import static com.aleksandrp.testapplicationalinataranovskaya.utils.ShowImage.showImageFromFile;
 
 public class DetailsMoveActivity extends AppCompatActivity implements MvpActionView {
@@ -63,14 +64,20 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
     @Bind(R.id.fab_deleter)
     FloatingActionButton fab_deleter;
 
-
-    private Intent serviceIntent;
-    private DetailsPresenter mPresenter;
+    @Inject
+    DetailsPresenter mPresenter;
 
     private Handler mUiHandler = new Handler();
 
     private long idMove;
     private FullInfoMoveModel mData;
+
+
+    DetailsActivityComponent getAppComponent() {
+        return ((App) getApplication())
+                .getAppComponent()
+                .plus(new DetailsActivityModule(DetailsMoveActivity.this));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +85,7 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
         setContentView(R.layout.activity_details_move);
         ButterKnife.bind(this);
 
-        serviceIntent = new Intent(this, ServiceApi.class);
-        mPresenter = new DetailsPresenter();
-        mPresenter.setMvpView(this);
-        mPresenter.init();
+        getAppComponent().inject(this);
 
         idMove = getIntent().getLongExtra(EXTRA_ID_MOVE, -1);
 
@@ -107,7 +111,6 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
     protected void onStart() {
         super.onStart();
         showProgress(true);
-        mPresenter.registerSubscriber();
         if (idMove > 0) {
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -118,21 +121,6 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mPresenter.unRegisterSubscriber();
-    }
-
-    @Override
-    protected void onDestroy() {
-        mPresenter.unRegisterSubscriber();
-        if (mPresenter != null) {
-            mPresenter.destroy();
-        }
-        stopService(serviceIntent);
-        super.onDestroy();
-    }
     //    ===========================================
 
     @OnClick(R.id.fab_save)
@@ -146,16 +134,6 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
         saveMoveInDb(false);
         menu_fab.toggle(true);
     }
-
-    //    ===========================================
-
-    public void makeRequest(NetworkRequestEvent mEvent, long id) {
-        showProgress(true);
-        serviceIntent.putExtra(SERVICE_JOB_ID_TITLE, mEvent.getId());
-        serviceIntent.putExtra(EXTRA_ID_MOVE, id);
-        startService(serviceIntent);
-    }
-
     //    ===========================================
 
     public void showProgress(boolean mShowPhone) {

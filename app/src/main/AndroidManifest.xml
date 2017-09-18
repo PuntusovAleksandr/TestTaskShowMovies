@@ -43,11 +43,6 @@
             android:theme="@style/AppTheme.Search"
             android:windowSoftInputMode="stateAlwaysHidden"/>
 
-        <service
-            android:name=".api.service.ServiceApi"
-            android:enabled="true"
-            android:exported="false"/>
-
     </application>
 
 </manifest>

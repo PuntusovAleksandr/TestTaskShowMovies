@@ -1,75 +1,29 @@
 package com.aleksandrp.testapplicationalinataranovskaya.presenter;
 
 import com.aleksandrp.testapplicationalinataranovskaya.activity.DetailsMoveActivity;
-import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkFailEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.UpdateUiEvent;
+import com.aleksandrp.testapplicationalinataranovskaya.api.helper.ApiMoveHelper;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.FullInfoMoveModel;
-import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.PresenterEventListener;
+import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.MvpView;
 
+import javax.inject.Inject;
+
+import retrofit2.Response;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.GET_MOVE_INFO;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants.RESPONSE_GET_MOVE_INFO;
 
 /**
  * Created by AleksandrP on 12.09.2017.
  */
 
-public class DetailsPresenter extends BasePresenter implements PresenterEventListener {
+public class DetailsPresenter {
 
+    private MvpView mvpView;
+    private ApiMoveHelper apiHelper;
 
-    private Subscriber subscriber;
-
-    @Override
-    public void init() {
-
+    @Inject
+    public DetailsPresenter(ApiMoveHelper mApiHelper, MvpView mMvpView) {
+        this.mvpView = mMvpView;
+        this.apiHelper = mApiHelper;
     }
-
-    @Override
-    public void registerSubscriber() {
-        subscriber = new Subscriber() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onNext(Object mO) {
-                if (mO instanceof UpdateUiEvent) {
-                    UpdateUiEvent event = (UpdateUiEvent) mO;
-                    Object data = event.getData();
-                    if (event.getId() == RESPONSE_GET_MOVE_INFO) {
-                        showDetails((FullInfoMoveModel) data);
-                    }
-                } else if (mO instanceof NetworkFailEvent) {
-                    NetworkFailEvent event = (NetworkFailEvent) mO;
-                    showMessageError(event.getMessage());
-                }
-            }
-        };
-        BusProvider.observe().observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber);
-    }
-
-    //================================================
-    @Override
-    public void unRegisterSubscriber() {
-        if (subscriber != null && !subscriber.isUnsubscribed()) {
-            subscriber.unsubscribe();
-        }
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        subscriber = null;
-    }
-
     //================================================
 
     public void showMessageError(String mData) {
@@ -91,8 +45,38 @@ public class DetailsPresenter extends BasePresenter implements PresenterEventLis
     //================================================
 
     public void getDetailsMove(long id) {
-        final NetworkRequestEvent mEvent = new NetworkRequestEvent();
-        mEvent.setId(GET_MOVE_INFO);
-        ((DetailsMoveActivity) mvpView).makeRequest(mEvent, id);
+        showDialog();
+        apiHelper.getDetailsMove(id)
+                .subscribe(new Subscriber<Response<FullInfoMoveModel>>() {
+                    private FullInfoMoveModel body;
+
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showMessageError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Response<FullInfoMoveModel> mResponse) {
+                        if (mResponse.isSuccessful()) {
+                            body = mResponse.body();
+                            showDetails(body);
+                        } else {
+                            showMessageError(mResponse.message());
+                        }
+                    }
+                });
+    }
+
+    private void showDialog() {
+        try {
+            ((DetailsMoveActivity) mvpView).showProgress(true);
+        } catch (Exception mE) {
+            mE.printStackTrace();
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.aleksandrp.testapplicationalinataranovskaya.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -13,23 +12,21 @@ import com.aleksandrp.testapplicationalinataranovskaya.App;
 import com.aleksandrp.testapplicationalinataranovskaya.R;
 import com.aleksandrp.testapplicationalinataranovskaya.activity.dialog.FilterDialog;
 import com.aleksandrp.testapplicationalinataranovskaya.adapter.ViewAdapter;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkRequestEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.GenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
-import com.aleksandrp.testapplicationalinataranovskaya.api.service.ServiceApi;
+import com.aleksandrp.testapplicationalinataranovskaya.di.MainActivityComponent;
+import com.aleksandrp.testapplicationalinataranovskaya.di.modulies.MainActivityModule;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.MaiPresenter;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.interfaces.MvpActionView;
 import com.aleksandrp.testapplicationalinataranovskaya.utils.ShowToast;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_GENRES_ID;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_PAGE;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_SEARCH;
-import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.SERVICE_JOB_ID_TITLE;
 import static com.aleksandrp.testapplicationalinataranovskaya.utils.InternetUtils.checkInternetConnection;
 
 public class MainActivity extends AppCompatActivity implements MvpActionView {
@@ -43,16 +40,20 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
     TabLayout tabs;
 
     private UpdatePopular mUpdatePopular;
-    private UpdateFavorite mListenerFavorite;
-
-    private Intent serviceIntent;
-    private MaiPresenter mPresenter;
 
     private FilterDialog mFilterDialog;
 
     private String genres;
-
     private int current_page = 1;
+
+    @Inject
+    MaiPresenter mPresenter;
+
+    MainActivityComponent getAppComponent() {
+        return ((App) getApplication())
+                .getAppComponent()
+                .plus(new MainActivityModule(MainActivity.this));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,41 +61,14 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        serviceIntent = new Intent(this, ServiceApi.class);
-        mPresenter = new MaiPresenter();
-        mPresenter.setMvpView(this);
-        mPresenter.init();
+        getAppComponent().inject(this);
 
         initViewPager();
 
         genres = "";
 
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mPresenter.registerSubscriber();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mPresenter.unRegisterSubscriber();
-    }
-
-    @Override
-    protected void onDestroy() {
-        mPresenter.unRegisterSubscriber();
-        if (mPresenter != null) {
-            mPresenter.destroy();
-        }
-        stopService(serviceIntent);
-        super.onDestroy();
-    }
-
     //    ===========================================
-
 
     public void showDialogFilter() {
         if (mFilterDialog != null && mFilterDialog.isShowing()) return;
@@ -147,21 +121,6 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
         this.mUpdatePopular = mListenerPopular;
     }
 
-    public void setListenerPresenter(UpdateFavorite mListenerFavorite) {
-        this.mListenerFavorite = mListenerFavorite;
-    }
-
-    //    ===========================================
-
-    public void makeRequest(NetworkRequestEvent mEvent, String mSearch, String filter, int current_page) {
-        showProgress(true);
-        serviceIntent.putExtra(SERVICE_JOB_ID_TITLE, mEvent.getId());
-        serviceIntent.putExtra(EXTRA_SEARCH, mSearch);
-        serviceIntent.putExtra(EXTRA_GENRES_ID, filter);
-        serviceIntent.putExtra(EXTRA_PAGE, current_page);
-        startService(serviceIntent);
-    }
-
     //    ===========================================
     public void getLostMoves(int mCurrent_page) {
         this.current_page = mCurrent_page;
@@ -207,19 +166,10 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
         ShowToast.showMessageError(mData);
     }
 
-    public void makeStopService() {
-        stopService(serviceIntent);
-    }
-
-
     public interface UpdatePopular {
         void updateList(ListMoveModel mData);
 
         void updateListMore(ListMoveModel mData);
-    }
-
-    public interface UpdateFavorite {
-        void updateList(ListMoveModel mData);
     }
 }
 

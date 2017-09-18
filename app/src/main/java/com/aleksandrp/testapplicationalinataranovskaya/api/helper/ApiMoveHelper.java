@@ -1,17 +1,16 @@
 package com.aleksandrp.testapplicationalinataranovskaya.api.helper;
 
 import com.aleksandrp.testapplicationalinataranovskaya.api.RestAdapter;
-import com.aleksandrp.testapplicationalinataranovskaya.api.bus.BusProvider;
-import com.aleksandrp.testapplicationalinataranovskaya.api.constants.ApiConstants;
-import com.aleksandrp.testapplicationalinataranovskaya.api.event.NetworkResponseEvent;
 import com.aleksandrp.testapplicationalinataranovskaya.api.interfaces.ServiceTask;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.FullInfoMoveModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListGenresModel;
 import com.aleksandrp.testapplicationalinataranovskaya.api.model.ListMoveModel;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import retrofit2.Response;
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -21,200 +20,59 @@ import static com.aleksandrp.testapplicationalinataranovskaya.api.RestAdapter.AP
  * Created by AleksandrP on 11.09.2017.
  */
 
+@Singleton
 public class ApiMoveHelper {
 
     protected RestAdapter restAdapter;
 
+    @Inject
     public ApiMoveHelper() {
         restAdapter = new RestAdapter();
     }
 
-    public void getListPopular(int mPage, String mGenres) {
+    public Observable<Response<ListMoveModel>> getListPopular(int mPage, String mGenres) {
         restAdapter.init(false, "getListPopular");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListMoveModel>> allSources =
                 serviceUser.getListPopular(API_KEY, mPage, "popularity.des", mGenres);
-        allSources.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response<ListMoveModel>>() {
-                    private NetworkResponseEvent event;
-                    private NetworkResponseEvent<String> eventError;
-                    private ListMoveModel body;
-
-                    @Override
-                    public void onCompleted() {
-                        if (event != null) {
-                            event.setSucess(true);
-                            event.setData(body);
-                        } else {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.ERROR);
-                            event.setSucess(false);
-                        }
-                        BusProvider.send(event);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        eventError = new NetworkResponseEvent<>();
-                        eventError.setId(ApiConstants.ERROR);
-                        eventError.setData("Error load Sources ::: " + e.getMessage());
-                        eventError.setSucess(false);
-                        BusProvider.send(eventError);
-                    }
-
-                    @Override
-                    public void onNext(Response<ListMoveModel> mResponse) {
-                        if (mResponse.isSuccessful()) {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.LIST_POPULAR);
-                            body = mResponse.body();
-                        }
-                    }
-                });
+        return allSources.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 
-    public void getListGenres() {
+    public Observable<Response<ListGenresModel>> getListGenres() {
         restAdapter.init(false, "getListGenres");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListGenresModel>> allSources =
                 serviceUser.getListOficial(API_KEY);
-        allSources.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response<ListGenresModel>>() {
-                    private NetworkResponseEvent event;
-                    private NetworkResponseEvent<String> eventError;
-                    private ListGenresModel body;
+        return allSources.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
 
-                    @Override
-                    public void onCompleted() {
-                        if (event != null) {
-                            event.setSucess(true);
-                            event.setData(body);
-                        } else {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.ERROR);
-                            event.setSucess(false);
-                        }
-                        BusProvider.send(event);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        eventError = new NetworkResponseEvent<>();
-                        eventError.setId(ApiConstants.ERROR);
-                        eventError.setData("Error load Sources ::: " + e.getMessage());
-                        eventError.setSucess(false);
-                        BusProvider.send(eventError);
-                    }
-
-                    @Override
-                    public void onNext(Response<ListGenresModel> mResponse) {
-                        if (mResponse.isSuccessful()) {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.LIST_OFFICIAL);
-                            body = mResponse.body();
-                        }
-                    }
-                });
     }
 
 
-    public void searchMovies(String mSearch) {
+    public Observable<Response<ListMoveModel>> searchMovies(String mSearch) {
         restAdapter.init(false, "searchMovies");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<ListMoveModel>> allSources =
                 serviceUser.searchMove(API_KEY, mSearch);
-        allSources.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response<ListMoveModel>>() {
-                    private NetworkResponseEvent event;
-                    private NetworkResponseEvent<String> eventError;
-                    private ListMoveModel body;
+        return allSources.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
 
-                    @Override
-                    public void onCompleted() {
-                        if (event != null) {
-                            event.setSucess(true);
-                            event.setData(body);
-                        } else {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.ERROR);
-                            event.setSucess(false);
-                        }
-                        BusProvider.send(event);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        eventError = new NetworkResponseEvent<>();
-                        eventError.setId(ApiConstants.ERROR);
-                        eventError.setData("Error load Sources ::: " + e.getMessage());
-                        eventError.setSucess(false);
-                        BusProvider.send(eventError);
-                    }
-
-                    @Override
-                    public void onNext(Response<ListMoveModel> mResponse) {
-                        if (mResponse.isSuccessful()) {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.SEARCH_MOVE);
-                            body = mResponse.body();
-                        }
-                    }
-                });
     }
 
-    public void getDetailsMove(long mId) {
+    public Observable<Response<FullInfoMoveModel>> getDetailsMove(long mId) {
         restAdapter.init(false, "getDetailsMove");
         ServiceTask serviceUser =
                 restAdapter.getRetrofit().create(ServiceTask.class);
         Observable<Response<FullInfoMoveModel>> allSources =
                 serviceUser.getPrimaryInfo(mId, API_KEY);
-        allSources.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Response<FullInfoMoveModel>>() {
-                    private NetworkResponseEvent event;
-                    private NetworkResponseEvent<String> eventError;
-                    private FullInfoMoveModel body;
+        return allSources.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
 
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        eventError = new NetworkResponseEvent<>();
-                        eventError.setId(ApiConstants.ERROR);
-                        eventError.setData("Error load Sources ::: " + e.getMessage());
-                        eventError.setSucess(false);
-                        BusProvider.send(eventError);
-                    }
-
-                    @Override
-                    public void onNext(Response<FullInfoMoveModel> mResponse) {
-                        if (mResponse.isSuccessful()) {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.GET_MOVE_INFO);
-                            body = mResponse.body();
-                        }
-                        if (event != null) {
-                            event.setSucess(true);
-                            event.setData(body);
-                        } else {
-                            event = new NetworkResponseEvent<>();
-                            event.setId(ApiConstants.ERROR);
-                            event.setData(mResponse.code() +"");
-                            event.setSucess(false);
-                        }
-                        BusProvider.send(event);
-                    }
-                });
     }
 
 }
