@@ -2,11 +2,12 @@ package com.aleksandrp.testapplicationalinataranovskaya.db.models;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.RealmClass;
 
 /**
  * Created by AleksandrP on 12.09.2017.
  */
-
+@RealmClass
 public class MoveModelDb extends RealmObject {
 
     @PrimaryKey
