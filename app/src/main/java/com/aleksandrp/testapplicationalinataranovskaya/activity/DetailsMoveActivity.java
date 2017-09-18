@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.Realm;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.api.RestAdapter.API_BASE_URL_IMAGE;
 import static com.aleksandrp.testapplicationalinataranovskaya.api.constants.STATIC_PARAMS.EXTRA_ID_MOVE;
@@ -66,6 +67,8 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
 
     @Inject
     DetailsPresenter mPresenter;
+    @Inject
+    Realm realm;
 
     private Handler mUiHandler = new Handler();
 
@@ -186,6 +189,6 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
         modelDb.setOverview(mData.overview);
         modelDb.setSave(isSave);
 
-        RealmObj.getInstance().updateMove(modelDb, mPresenter);
+        RealmObj.getInstance().updateMove(modelDb, mPresenter, realm);
     }
 }

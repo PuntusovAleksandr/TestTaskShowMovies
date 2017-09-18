@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.aleksandrp.testapplicationalinataranovskaya.di.AppComponent;
 import com.aleksandrp.testapplicationalinataranovskaya.di.DaggerAppComponent;
 import com.aleksandrp.testapplicationalinataranovskaya.di.modulies.AppModule;
+import com.aleksandrp.testapplicationalinataranovskaya.di.modulies.RealmModule;
 
 /**
  * Created by AleksandrP on 11.09.2017.
@@ -29,6 +30,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
         appComponent = DaggerAppComponent
                 .builder()
                 .appModule(new AppModule(this))
+                .realmModule(new RealmModule(this))
                 .build();
     }
 

@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 
 import static com.aleksandrp.testapplicationalinataranovskaya.utils.InternetUtils.checkInternetConnection;
 
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
 
     @Inject
     MaiPresenter mPresenter;
+    @Inject
+    Realm realm;
 
     MainActivityComponent getAppComponent() {
         return ((App) getApplication())
@@ -90,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements MvpActionView {
     private void initViewPager() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         ViewAdapter mTabAdapter =
-                new ViewAdapter(fragmentManager);
+                new ViewAdapter(fragmentManager, realm);
 
         tabs.addTab(tabs.newTab().setText(R.string.popular));
         tabs.addTab(tabs.newTab().setText(R.string.favorite));

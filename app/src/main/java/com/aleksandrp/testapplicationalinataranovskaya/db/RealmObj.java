@@ -1,14 +1,11 @@
 package com.aleksandrp.testapplicationalinataranovskaya.db;
 
-import android.content.Context;
-
 import com.aleksandrp.testapplicationalinataranovskaya.App;
 import com.aleksandrp.testapplicationalinataranovskaya.R;
 import com.aleksandrp.testapplicationalinataranovskaya.db.models.MoveModelDb;
 import com.aleksandrp.testapplicationalinataranovskaya.presenter.DetailsPresenter;
 
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
 /**
@@ -17,14 +14,10 @@ import io.realm.RealmResults;
 
 public class RealmObj {
 
-    public static final String LOG_REALM = "LOG_REALM";
     // version DB
     public static final long VERSION_DB = 1;
 
     private static RealmObj sRealmObj;
-    private Context context;
-    private Realm realm;
-    private int allNameTypeCalendarsByUser;
 
 
     public synchronized static RealmObj getInstance() {
@@ -34,47 +27,15 @@ public class RealmObj {
         return sRealmObj;
     }
 
-    /**
-     * for creating (or change) data base, need reopen Realm
-     * This method need calling after save data in Shared preference
-     */
-    public static void stopRealm() {
-        if (sRealmObj != null) {
-            sRealmObj.closeRealm(App.getContext());
-        }
-    }
-
-    private void closeRealm(Context context) {
-        if (realm != null) {
-            realm.close();
-            realm = null;
-            setRealmData(context);
-        }
-    }
-
 
     private RealmObj() {
-        this.context = App.getContext();
-        if (realm == null) {
-            setRealmData(context);
-        }
-    }
 
-    private void setRealmData(Context context) {
-        String nameDB = RealmObj.class.getName();
-        realm.init(context);
-        RealmConfiguration myConfig = new RealmConfiguration.Builder()
-                .name(nameDB)
-                .deleteRealmIfMigrationNeeded()
-                .schemaVersion(VERSION_DB)
-                .build();
-        realm = Realm.getInstance(myConfig);
     }
 
     //    ===============================================================
 
-    public void updateMove(final MoveModelDb mModelDb, final DetailsPresenter mPresenter) {
-        realm.executeTransactionAsync(
+    public void updateMove(final MoveModelDb mModelDb, final DetailsPresenter mPresenter, Realm mRealm) {
+        mRealm.executeTransactionAsync(
                 new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -93,8 +54,8 @@ public class RealmObj {
                 });
     }
 
-    public RealmResults<MoveModelDb> getMoveModelDb() {
-        return realm
+    public RealmResults<MoveModelDb> getMoveModelDb(Realm mRealm) {
+        return mRealm
                 .where(MoveModelDb.class)
                 .equalTo("save", true)
                 .findAll();
