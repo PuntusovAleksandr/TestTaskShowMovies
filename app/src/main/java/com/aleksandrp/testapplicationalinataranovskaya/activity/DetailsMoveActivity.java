@@ -145,7 +145,7 @@ public class DetailsMoveActivity extends AppCompatActivity implements MvpActionV
     }
 
     public void showMessageError(String mData) {
-        if ((mData.contains("The resource you requested could not be found")) ||
+        if ((mData.toLowerCase().contains("not found")) ||
                 (mData.toLowerCase().contains("error"))) {
             finish();
         } else {
